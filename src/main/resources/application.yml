@@ -4,6 +4,6 @@ spring:
     properties:
         default_schema: public
   datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/postgres
+    url: jdbc:postgresql://localhost:5432/postgres
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
