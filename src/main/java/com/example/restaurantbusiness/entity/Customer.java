@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Entity
@@ -20,4 +21,7 @@ public class Customer {
     private String name;
 
     private String phone;
+
+    @NonNull
+    private Boolean isRegistered = false;
 }
