@@ -37,6 +37,7 @@ public class CustomerOrderServiceTest {
         customer.setId(1L);
         customer.setName("John Doe");
         customer.setPhone("01073483632");
+        customer.setIsRegistered(true);
 
         CustomerOrder order1 = new CustomerOrder();
         order1.setId(1L);
@@ -83,6 +84,6 @@ public class CustomerOrderServiceTest {
         verify(customerOrderRepository, times(1)).findByOrderDateTimeBetween(any(), any());
 
         assertNotNull(totalSaleAmount);
-        assertEquals(BigDecimal.valueOf(530.0), totalSaleAmount); // 50.0 + 30.0 + 20.0
+        assertEquals(BigDecimal.valueOf(530.0), totalSaleAmount); // 200.0 + 100.0 + 230.0
     }
 }
