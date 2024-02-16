@@ -10,16 +10,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CustomerOrderService {
-    private final CustomerOrderRepository orderRepository;
+    private final CustomerOrderRepository customerOrderRepository;
 
     public CustomerOrderService(CustomerOrderRepository orderRepository) {
-        this.orderRepository = orderRepository;
+        this.customerOrderRepository = orderRepository;
     }
 
     public List<CustomerOrder> getOrdersForCurrentDay() {
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = startOfDay.plusHours(23).plusMinutes(59).plusSeconds(59);
-        return orderRepository.findByOrderDateTimeBetween(startOfDay, endOfDay);
+        return customerOrderRepository.findByOrderDateTimeBetween(startOfDay, endOfDay);
     }
 
     public BigDecimal getTotalSaleAmountForCurrentDay() {
@@ -28,5 +28,9 @@ public class CustomerOrderService {
         return currentDayOrders.stream()
             .map(CustomerOrder::getPrice)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public List<CustomerOrder> getOrdersByCustomerId(Long customerId) {
+        return customerOrderRepository.findByCustomerId(customerId);
     }
 }
