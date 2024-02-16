@@ -86,4 +86,21 @@ public class CustomerOrderServiceTest {
         assertNotNull(totalSaleAmount);
         assertEquals(BigDecimal.valueOf(530.0), totalSaleAmount); // 200.0 + 100.0 + 230.0
     }
+
+    @Test
+    void getOrdersByCustomerIdTest() {
+        Long customerId = 1L;
+        
+        when(customerOrderRepository.findByCustomerId(customerId)).thenReturn(customerOrders);
+
+        List<CustomerOrder> result = customerOrderService.getOrdersByCustomerId(customerId);
+
+        verify(customerOrderRepository, times(1)).findByCustomerId(customerId);
+
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        assertEquals(customerOrders.get(0), result.get(0));
+        assertEquals(customerOrders.get(1), result.get(1));
+        assertEquals(customerOrders.get(2), result.get(2));
+    }
 }
