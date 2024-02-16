@@ -3,6 +3,7 @@ package com.example.restaurantbusiness.service;
 import com.example.restaurantbusiness.entity.CustomerOrder;
 import com.example.restaurantbusiness.repository.CustomerOrderRepository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class CustomerOrderService {
     private final CustomerOrderRepository customerOrderRepository;
@@ -37,14 +39,18 @@ public class CustomerOrderService {
     }
 
     public String getMaxSaleDay(LocalDate startDate, LocalDate endDate) {
+        log.debug("Calling findMaxSaleDay method from customerOrderRepository");
         List<Object[]> result = customerOrderRepository
             .findMaxSaleDay(startDate.atStartOfDay(),
                 endDate.atStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59));
+        log.debug("Got results from findMaxSaleDay method from customerOrderRepository");
 
         if (result != null && !result.isEmpty()) {
+            log.debug("Parsing results got from findMaxSaleDay method");
             Object[] maxSaleDay = result.get(0);
             LocalDate maxSaleDate = LocalDate.parse(maxSaleDay[0].toString());
             BigDecimal totalSaleAmount = (BigDecimal) maxSaleDay[1];
+            log.debug("Parsed results got from findMaxSaleDay method");
 
             return "Max Sale Day: " + maxSaleDate + ", Total Sale Amount: " + totalSaleAmount;
         }
