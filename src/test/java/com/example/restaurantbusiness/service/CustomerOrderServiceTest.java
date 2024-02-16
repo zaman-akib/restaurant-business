@@ -18,7 +18,9 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @SpringBootTest
@@ -102,5 +104,42 @@ public class CustomerOrderServiceTest {
         assertEquals(customerOrders.get(0), result.get(0));
         assertEquals(customerOrders.get(1), result.get(1));
         assertEquals(customerOrders.get(2), result.get(2));
+    }
+
+    @Test
+    void getMaxSaleDayTest() {
+        LocalDate startDate = LocalDate.parse("2023-01-01");
+        LocalDate endDate = LocalDate.parse("2023-12-31");
+        
+        Object[] maxSaleDayResult = new Object[]{LocalDate.parse("2023-06-15"), BigDecimal.valueOf(500.0)};
+        List<Object[]> result = Collections.singletonList(maxSaleDayResult);
+        
+        when(customerOrderRepository.findMaxSaleDay(any(), any())).thenReturn(result);
+
+        String maxSaleDayInfo = customerOrderService.getMaxSaleDay(startDate, endDate);
+
+        verify(customerOrderRepository, times(1)).findMaxSaleDay(
+            startDate.atStartOfDay(), endDate.atStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59));
+
+        assertNotNull(maxSaleDayInfo);
+        assertEquals("Max Sale Day: 2023-06-15, Total Sale Amount: 500.0", maxSaleDayInfo);
+    }
+
+    @Test
+    void getMaxSaleDayNoDataTest() {
+        LocalDate startDate = LocalDate.parse("2023-01-01");
+        LocalDate endDate = LocalDate.parse("2023-12-31");
+
+        List<Object[]> result = List.of();
+
+        when(customerOrderRepository.findMaxSaleDay(any(), any())).thenReturn(result);
+
+        String maxSaleDayInfo = customerOrderService.getMaxSaleDay(startDate, endDate);
+
+        verify(customerOrderRepository, times(1)).findMaxSaleDay(
+            startDate.atStartOfDay(), endDate.atStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59));
+
+        assertNotNull(maxSaleDayInfo);
+        assertEquals("No data found for the given time range.", maxSaleDayInfo);
     }
 }
