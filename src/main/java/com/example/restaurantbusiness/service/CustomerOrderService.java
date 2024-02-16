@@ -2,11 +2,13 @@ package com.example.restaurantbusiness.service;
 
 import com.example.restaurantbusiness.entity.CustomerOrder;
 import com.example.restaurantbusiness.repository.CustomerOrderRepository;
+
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.stereotype.Service;
 
 @Service
 public class CustomerOrderService {
@@ -32,5 +34,21 @@ public class CustomerOrderService {
 
     public List<CustomerOrder> getOrdersByCustomerId(Long customerId) {
         return customerOrderRepository.findByCustomerId(customerId);
+    }
+
+    public String getMaxSaleDay(LocalDate startDate, LocalDate endDate) {
+        List<Object[]> result = customerOrderRepository
+            .findMaxSaleDay(startDate.atStartOfDay(),
+                endDate.atStartOfDay().plusHours(23).plusMinutes(59).plusSeconds(59));
+
+        if (result != null && !result.isEmpty()) {
+            Object[] maxSaleDay = result.get(0);
+            LocalDate maxSaleDate = LocalDate.parse(maxSaleDay[0].toString());
+            BigDecimal totalSaleAmount = (BigDecimal) maxSaleDay[1];
+
+            return "Max Sale Day: " + maxSaleDate + ", Total Sale Amount: " + totalSaleAmount;
+        }
+
+        return "No data found for the given time range.";
     }
 }
