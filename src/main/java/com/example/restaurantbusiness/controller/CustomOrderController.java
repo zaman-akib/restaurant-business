@@ -4,6 +4,8 @@ import com.example.restaurantbusiness.entity.CustomerOrder;
 import com.example.restaurantbusiness.entity.Product;
 import com.example.restaurantbusiness.service.CustomerOrderService;
 
+import java.time.LocalDateTime;
+import java.time.YearMonth;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -69,8 +71,21 @@ public class CustomOrderController {
     @GetMapping("/top-5-sold-items-of-all-time")
     public ResponseEntity<List<Product>> getTopFiveSoldItemsOfAllTime() {
         log.info("Getting top 5 selling items of all time");
-        List<Product> customerOrders = customerOrderService.getTopSoldItemsOfAllTime(5);
+        List<Product> customerOrders = customerOrderService
+            .getTopSoldItemsOfAllTimeBasedOnTotalSaleAmount(5);
         log.info("Successfully retrieved top 5 selling items of all time");
+        return ResponseEntity.ok(customerOrders);
+    }
+
+    @GetMapping("/top-5-sold-items-of-last-month")
+    public ResponseEntity<List<Product>> getTopFiveSoldItemsOfLastMonth() {
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        YearMonth lastMonth = YearMonth.from(currentDateTime.minusMonths(1));
+
+        log.info("Getting top 5 selling items of last month");
+        List<Product> customerOrders = customerOrderService
+            .getTopSoldItemsBasedOnSalesOfAMonth(5, lastMonth);
+        log.info("Successfully retrieved top 5 selling items of last month");
         return ResponseEntity.ok(customerOrders);
     }
 }

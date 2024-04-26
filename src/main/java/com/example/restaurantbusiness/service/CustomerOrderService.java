@@ -4,6 +4,7 @@ import com.example.restaurantbusiness.entity.CustomerOrder;
 import com.example.restaurantbusiness.entity.Product;
 import com.example.restaurantbusiness.repository.CustomerOrderRepository;
 
+import java.time.YearMonth;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,9 +42,17 @@ public class CustomerOrderService {
         return customerOrderRepository.findByCustomerId(customerId);
     }
 
-    public List<Product> getTopSoldItemsOfAllTime(Integer numberOfItems) {
+    public List<Product> getTopSoldItemsOfAllTimeBasedOnTotalSaleAmount(Integer numberOfItems) {
         Pageable pageable = PageRequest.of(0, numberOfItems);
         return customerOrderRepository.getTopSoldItemsOfAllTime(pageable)
+            .stream().toList();
+    }
+
+    public List<Product> getTopSoldItemsBasedOnSalesOfAMonth(Integer numberOfItems, YearMonth yearMonth) {
+        Pageable pageable = PageRequest.of(0, numberOfItems);
+        LocalDateTime firstDateOfMonth = yearMonth.atDay(1).atStartOfDay();
+        LocalDateTime lastDateOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
+        return customerOrderRepository.getTopSoldItemsBasedOnSalesByTimeRange(pageable, firstDateOfMonth, lastDateOfMonth)
             .stream().toList();
     }
 

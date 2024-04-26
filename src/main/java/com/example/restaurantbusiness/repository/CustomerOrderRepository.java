@@ -31,4 +31,11 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
         "group by co.product " +
         "order by total_sale_amount desc")
     Page<Product> getTopSoldItemsOfAllTime(Pageable pageable);
+
+    @Query("select co.product, sum(co.quantity) as total_quantity_sold " +
+        "from CustomerOrder co " +
+        "where co.orderDateTime between :startDate and :endDate " +
+        "group by co.product " +
+        "order by total_quantity_sold desc")
+    Page<Product> getTopSoldItemsBasedOnSalesByTimeRange(Pageable pageable, LocalDateTime startDate, LocalDateTime endDate);
 }
