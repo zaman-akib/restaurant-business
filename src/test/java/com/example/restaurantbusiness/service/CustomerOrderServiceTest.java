@@ -9,17 +9,23 @@ import static org.mockito.Mockito.when;
 
 import com.example.restaurantbusiness.entity.Customer;
 import com.example.restaurantbusiness.entity.CustomerOrder;
+import com.example.restaurantbusiness.entity.Product;
 import com.example.restaurantbusiness.repository.CustomerOrderRepository;
 
+import java.time.YearMonth;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,10 +36,23 @@ public class CustomerOrderServiceTest {
     @Mock
     private CustomerOrderRepository customerOrderRepository;
     private List<CustomerOrder> customerOrders;
+    private List<Product> mockProducts;
 
     @BeforeEach
     void setup() {
         LocalDateTime currentDateTime = LocalDateTime.now();
+
+        Product product1 = new Product();
+        product1.setId(1L);
+        product1.setName("P1");
+        product1.setPrice(BigDecimal.valueOf(100.0));
+        product1.setStockAvailable(5);
+
+        Product product2 = new Product();
+        product2.setId(2L);
+        product2.setName("P2");
+        product2.setPrice(BigDecimal.valueOf(200.0));
+        product2.setStockAvailable(12);
 
         Customer customer = new Customer();
         customer.setId(1L);
@@ -46,20 +65,30 @@ public class CustomerOrderServiceTest {
         order1.setOrderDateTime(currentDateTime.minusHours(1));
         order1.setCustomer(customer);
         order1.setPrice(BigDecimal.valueOf(200.0));
+        order1.setProduct(product2);
+        order1.setQuantity(5);
 
         CustomerOrder order2 = new CustomerOrder();
         order2.setId(2L);
         order2.setOrderDateTime(currentDateTime);
         order2.setCustomer(customer);
         order2.setPrice(BigDecimal.valueOf(100.0));
+        order2.setProduct(product1);
+        order2.setQuantity(2);
 
         CustomerOrder order3 = new CustomerOrder();
         order3.setId(3L);
         order3.setOrderDateTime(currentDateTime.plusHours(1));
         order3.setCustomer(customer);
         order3.setPrice(BigDecimal.valueOf(230.0));
+        order3.setProduct(product1);
+        order3.setQuantity(2);
 
         customerOrders = List.of(order1, order2, order3);
+
+
+
+        mockProducts = Arrays.asList(product1, product2);
     }
 
     @Test
@@ -141,5 +170,42 @@ public class CustomerOrderServiceTest {
 
         assertNotNull(maxSaleDayInfo);
         assertEquals("No data found for the given time range.", maxSaleDayInfo);
+    }
+
+    @Test
+    public void getTopSoldItemsOfAllTimeBasedOnTotalSaleAmountTest() {
+        Pageable pageable = PageRequest.of(0, 5);
+        when(customerOrderRepository.getTopSoldItemsOfAllTime(pageable)).thenReturn(
+            new PageImpl<>(mockProducts));
+
+        int numberOfItems = 5;
+        List<Product> result = customerOrderService.getTopSoldItemsOfAllTimeBasedOnTotalSaleAmount(numberOfItems);
+
+        assertEquals(mockProducts.size(), result.size());
+        for (int i = 0; i < mockProducts.size(); i++) {
+            assertEquals(mockProducts.get(i).getName(), result.get(i).getName());
+        }
+
+        verify(customerOrderRepository, times(1)).getTopSoldItemsOfAllTime(pageable);
+    }
+
+    @Test
+    public void getTopSoldItemsBasedOnSalesOfAMonthTest() {
+        Pageable pageable = PageRequest.of(0, 5);
+        LocalDateTime firstDateOfMonth = YearMonth.of(2022, 3).atDay(1).atStartOfDay();
+        LocalDateTime lastDateOfMonth = YearMonth.of(2022, 3).atEndOfMonth().atTime(23, 59, 59);
+        when(customerOrderRepository.getTopSoldItemsBasedOnSalesByTimeRange(pageable, firstDateOfMonth, lastDateOfMonth))
+            .thenReturn(new PageImpl<>(mockProducts));
+
+        int numberOfItems = 5;
+        YearMonth yearMonth = YearMonth.of(2022, 3);
+        List<Product> result = customerOrderService.getTopSoldItemsBasedOnSalesOfAMonth(numberOfItems, yearMonth);
+
+        assertEquals(mockProducts.size(), result.size());
+        for (int i = 0; i < mockProducts.size(); i++) {
+            assertEquals(mockProducts.get(i).getName(), result.get(i).getName());
+        }
+
+        verify(customerOrderRepository, times(1)).getTopSoldItemsBasedOnSalesByTimeRange(pageable, firstDateOfMonth, lastDateOfMonth);
     }
 }
