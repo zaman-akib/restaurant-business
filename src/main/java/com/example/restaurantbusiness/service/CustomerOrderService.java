@@ -1,9 +1,12 @@
 package com.example.restaurantbusiness.service;
 
 import com.example.restaurantbusiness.entity.CustomerOrder;
+import com.example.restaurantbusiness.entity.Product;
 import com.example.restaurantbusiness.repository.CustomerOrderRepository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -36,6 +39,12 @@ public class CustomerOrderService {
 
     public List<CustomerOrder> getOrdersByCustomerId(Long customerId) {
         return customerOrderRepository.findByCustomerId(customerId);
+    }
+
+    public List<Product> getTopSoldItemsOfAllTime(Integer numberOfItems) {
+        Pageable pageable = PageRequest.of(0, numberOfItems);
+        return customerOrderRepository.getTopSoldItemsOfAllTime(pageable)
+            .stream().toList();
     }
 
     public String getMaxSaleDay(LocalDate startDate, LocalDate endDate) {

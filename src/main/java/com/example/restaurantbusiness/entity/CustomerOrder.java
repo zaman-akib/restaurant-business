@@ -26,6 +26,13 @@ public class CustomerOrder {
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @NonNull
+    private Integer quantity;
+
     @NonNull
     private BigDecimal price;
 

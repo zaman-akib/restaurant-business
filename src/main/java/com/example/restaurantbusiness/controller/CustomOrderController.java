@@ -1,6 +1,7 @@
 package com.example.restaurantbusiness.controller;
 
 import com.example.restaurantbusiness.entity.CustomerOrder;
+import com.example.restaurantbusiness.entity.Product;
 import com.example.restaurantbusiness.service.CustomerOrderService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -63,5 +64,13 @@ public class CustomOrderController {
         }
         log.info("Successfully retrieved max sale day between " + startDate + " and " + endDate);
         return ResponseEntity.ok(customerOrderService.getMaxSaleDay(startLocalDate, endLocalDate));
+    }
+
+    @GetMapping("/top-5-sold-items-of-all-time")
+    public ResponseEntity<List<Product>> getTopFiveSoldItemsOfAllTime() {
+        log.info("Getting top 5 selling items of all time");
+        List<Product> customerOrders = customerOrderService.getTopSoldItemsOfAllTime(5);
+        log.info("Successfully retrieved top 5 selling items of all time");
+        return ResponseEntity.ok(customerOrders);
     }
 }

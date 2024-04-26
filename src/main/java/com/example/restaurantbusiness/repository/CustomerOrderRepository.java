@@ -2,6 +2,9 @@ package com.example.restaurantbusiness.repository;
 
 import com.example.restaurantbusiness.entity.CustomerOrder;
 
+import com.example.restaurantbusiness.entity.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,4 +25,10 @@ public interface CustomerOrderRepository extends JpaRepository<CustomerOrder, Lo
         "order by totalSaleAmount desc " +
         "limit 1")
     List<Object[]> findMaxSaleDay(LocalDateTime startDate, LocalDateTime endDate);
+
+    @Query("select co.product, sum(co.product.price * co.quantity) as total_sale_amount " +
+        "from CustomerOrder co " +
+        "group by co.product " +
+        "order by total_sale_amount desc")
+    Page<Product> getTopSoldItemsOfAllTime(Pageable pageable);
 }

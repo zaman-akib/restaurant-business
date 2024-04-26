@@ -1,6 +1,7 @@
 package com.example.restaurantbusiness.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -18,6 +19,9 @@ public class Product {
     private String name;
 
     private String description;
+
+    @NonNull
+    private BigDecimal price;
 
     @NonNull
     private Integer stockAvailable;
