@@ -6,7 +6,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import com.example.restaurantbusiness.entity.Customer;
+import com.example.restaurantbusiness.entity.Product;
 import com.example.restaurantbusiness.repository.CustomerRepository;
+import com.example.restaurantbusiness.repository.ProductWishRepository;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -17,8 +20,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class CustomerServiceTest {
     @Mock
     private CustomerRepository customerRepository;
+    @Mock
+    private ProductWishRepository productWishRepository;
     @InjectMocks
     private CustomerService customerService;
+
 
     @Test
     void getAllRegisteredCustomersTest() {
@@ -50,5 +56,34 @@ public class CustomerServiceTest {
         registeredCustomer2.setIsRegistered(true);
 
         return List.of(registeredCustomer1, registeredCustomer2);
+    }
+
+    @Test
+    public void getWishListByCustomerIdTest() {
+        Integer customerId = 1;
+
+        Product product1 = new Product();
+        product1.setId(1L);
+        product1.setName("P1");
+        product1.setStockAvailable(5);
+        Product product2 = new Product();
+        product2.setId(2L);
+        product2.setName("P2");
+        product2.setStockAvailable(12);
+
+        List<Product> mockedProducts = Arrays.asList(product1, product2);
+
+        when(productWishRepository.findAllProductsByCustomerId(customerId))
+            .thenReturn(mockedProducts);
+
+        List<Product> result = customerService.getWishListByCustomerId(customerId);
+
+        assertEquals(mockedProducts.size(), result.size());
+        for (int i = 0; i < mockedProducts.size(); i++) {
+            assertEquals(mockedProducts.get(i).getId(), result.get(i).getId());
+            assertEquals(mockedProducts.get(i).getName(), result.get(i).getName());
+        }
+
+        verify(productWishRepository, times(1)).findAllProductsByCustomerId(customerId);
     }
 }
